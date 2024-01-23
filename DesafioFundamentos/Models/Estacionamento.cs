@@ -1,53 +1,62 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace DesafioFundamentos.Models
 {
     public class Estacionamento
     {
-        private decimal precoInicial = 0;
-        private decimal precoPorHora = 0;
-        private List<string> veiculos = new List<string>();
+        private decimal PrecoInicial { get; set; }
+        private decimal PrecoPorHora { get; set; }
+        private List<string> Veiculos { get; set; }
 
         public Estacionamento(decimal precoInicial, decimal precoPorHora)
         {
-            this.precoInicial = precoInicial;
-            this.precoPorHora = precoPorHora;
+            PrecoInicial = precoInicial;
+            PrecoPorHora = precoPorHora;
+            Veiculos = new List<string>();
         }
 
-        public void AdicionarVeiculo()
+        public void AdicionarVeiculo(string placa)
         {
-                Console.WriteLine("Digite a placa do veículo para estacionar:");
-                string placa = Console.ReadLine();
-
-                veiculos.Add(placa.ToUpper());
-                Console.WriteLine($"Veículo com placa {placa} estacionado com sucesso!");
-        }
-
-        public void RemoverVeiculo()
-        {
-            Console.WriteLine("Digite a placa do veículo para remover:");
-            string placa = Console.ReadLine();
-
-            if (veiculos.Any(x => x.ToUpper() == placa.ToUpper()))
+            try
             {
-                Console.WriteLine("Digite a quantidade de horas que o veículo permaneceu estacionado:");
-                int horas = Convert.ToInt32(Console.ReadLine());
+                if (!string.IsNullOrEmpty(placa))
+                {
+                    Veiculos.Add(placa.ToUpper());
+                    Console.WriteLine($"Veículo com placa {placa} estacionado com sucesso!");
+                }
+                else
+                {
+                    throw new ArgumentException("Placa inválida. Tente novamente.");
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
 
-                decimal valorTotal = precoInicial + (precoPorHora * horas);
-                veiculos.Remove(placa.ToUpper());
-
-                Console.WriteLine($"O veículo {placa} foi removido e o preço total foi de: R$ {valorTotal}");
+        public decimal RemoverVeiculo(string placa, int horas)
+        {
+            if (Veiculos.Any(x => x.ToUpper() == placa.ToUpper()))
+            {
+                Veiculos.Remove(placa.ToUpper());
+                return PrecoInicial + (PrecoPorHora * horas);
             }
             else
             {
                 Console.WriteLine("Desculpe, esse veículo não está estacionado aqui. Confira se digitou a placa corretamente");
+                return 0;
             }
         }
 
         public void ListarVeiculos()
         {
-            if (veiculos.Any())
+            if (Veiculos.Any())
             {
                 Console.WriteLine("Os veículos estacionados são:");
-                foreach (var veiculo in veiculos)
+                foreach (var veiculo in Veiculos)
                 {
                     Console.WriteLine(veiculo);
                 }
@@ -56,6 +65,11 @@ namespace DesafioFundamentos.Models
             {
                 Console.WriteLine("Não há veículos estacionados.");
             }
+        }
+
+        public decimal CalcularValorTotalAcumulado()
+        {
+            return Veiculos.Count > 0 ? Veiculos.Count * PrecoInicial : 0;
         }
     }
 }
